@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style type="text/css">
+                /*重置*/
+        body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td{margin:0;padding:0;}
+        table{border-collapse:collapse;border-spacing:0;}
+        fieldset,img{border:0;}
+        address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}
+        ol,ul{list-style:none;}
+        caption,th{text-align:left;}
+        h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}
+        q:before,q:after{content: ;}
+        abbr,acronym{border:0;}
+        body{color:#666; background-color:#fff;font: 12px/1.5 '微软雅黑',tahoma,arial,'Hiragino Sans GB',宋体,sans-serif;}
+        .clearfix:after {visibility:hidden;display:block;font-size:0;content:" ";clear:both;height:0;}
+        .clearfix {zoom:1;} 
+        /*旋转木马必要样式*/
+        .poster-main{ position:relative;width:800px;height:270px;top: 100px;left: 200px;background: #fff}
+        .poster-main a,.poster-main img{display:block;}
+        .poster-main .poster-list{width:800px;height:270px;}
+        .poster-main .poster-list .poster-item{ position:absolute;}
+        .poster-main .poster-btn{ position:absolute;top:0;width:100px;height:270px; z-index:10; cursor:pointer;  opacity:0.8;}
+        .poster-main .poster-prev-btn{left:0; background: url(btn_l.png) no-repeat center center;}
+        .poster-main .poster-next-btn{right:0; background: url(btn_r.png) no-repeat center center;}
+
+    </style>
+</head>
+<body>
+    <div class="J_Poster poster-main" data-setting='{
+                                                                                        "width":1000,
+                                                                                        "height":270,
+                                                                                        "posterWidth":640,
+                                                                                        "posterHeight":270,
+                                                                                        "scale":0.8,
+                                                                                        "autoPlay":true,
+                                                                                        "delay":2000,
+                                                                                        "speed":300
+
+                                                                                        }'>
+        <div class="poster-btn poster-prev-btn"></div>
+        <ul class="poster-list">
+            <li class="poster-item"><a href="#"><img src="1.jpg" width="100%" height="100%"></a></li>
+            <li class="poster-item"><a href="#"><img src="2.jpg" width="100%" height="100%"></a></li>
+            <li class="poster-item"><a href="#"><img src="3.jpg" width="100%" height="100%"></a></li>
+            <li class="poster-item"><a href="#"><img src="4.jpg" width="100%" height="100%"></a></li>
+            <li class="poster-item"><a href="#"><img src="5.jpg" width="100%" height="100%"></a></li>
+            <li class="poster-item"><a href="#"><img src="2.jpg" width="100%" height="100%"></a></li>
+            <li class="poster-item"><a href="#"><img src="3.jpg" width="100%" height="100%"></a></li>
+            <li class="poster-item"><a href="#"><img src="4.jpg" width="100%" height="100%"></a></li>
+            <li class="poster-item"><a href="#"><img src="5.jpg" width="100%" height="100%"></a></li>
+        </ul>
+        <div class="poster-btn poster-next-btn"></div>
+    </div>
+
+    <div class="J_Poster poster-main" data-setting='{
+                                                                                        "width":800,
+                                                                                        "height":270,
+                                                                                        "posterWidth":640,
+                                                                                        "posterHeight":270,
+                                                                                        "scale":0.8,
+                                                                                        "autoPlay":true,
+                                                                                        "delay":1000,
+                                                                                        "speed":300
+
+                                                                                        }'>
+        <div class="poster-btn poster-prev-btn"></div>
+        <ul class="poster-list">
+            <li class="poster-item"><a href="#"><img src="1.jpg" width="100%" height="100%"></a></li>
+            <li class="poster-item"><a href="#"><img src="2.jpg" width="100%" height="100%"></a></li>
+            <li class="poster-item"><a href="#"><img src="3.jpg" width="100%" height="100%"></a></li>
+            <li class="poster-item"><a href="#"><img src="4.jpg" width="100%" height="100%"></a></li>
+            
+           
+        </ul>
+        <div class="poster-btn poster-next-btn"></div>
+    </div>
+
+    
+</body>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+;(function ($) {
+    var Carousel=function(poster){
+        // var self=this;
+        // this.poster=poster;
+        var _self=this;
+        this.poster=poster;
+        this.posterItemMain=poster.find('ul.poster-list');
+        this.prevBtn=poster.find('div.poster-prev-btn');
+        this.nextBtn=poster.find('div.poster-next-btn');
+        this.posterItems=this.posterItemMain.find('li.poster-item');
+        //如果偶数张
+        if(this.posterItems.size()%2==0){
+                this.posterItemMain.append(this.posterItems.eq(0).clone());
+                this.posterItems = this.posterItemMain.children();
+            };
+
+        this.posterLevel=this.posterItemMain.find('li.poster-item').length/2;
+        this.firstItem=this.posterItems.first();
+        this.lastItem=this.posterItems.last();
+        this.rotateFlag=true;
+        this.setting={
+            "width":1000,
+            "height":270,
+            "posterWidth":640,
+            "posterHeight":270,
+            "scale":0.8,
+            "autoPlay":true,
+            "delay":2000,
+            "verticalAlign" :"middle" 
+        }
+        
+        $.extend(this.setting,this.getSetting());
+        this.setSettingValue();
+        this.setPosterPos();
+        this.prevBtn.click(function() {
+            if(_self.rotateFlag){
+                _self.carouselRotate("left");
+                _self.rotateFlag=false;
+            }
+            
+        });
+        this.nextBtn.click(function() {
+            if(_self.rotateFlag){
+                _self.carouselRotate("right");
+                _self.rotateFlag=false;
+            }
+        });
+        if(this.setting.autoPlay){
+            this.autoPlay()
+        }
+        this.poster.hover(function() {
+            clearInterval(_self.timer)
+        }, function() {
+            _self.autoPlay()
+        });
+        
+        
+    };
+    Carousel.prototype={
+        //自动播放
+        autoPlay:function(){
+            var self=this;
+            this.timer=setInterval(function(){
+                self.nextBtn.click()
+            },self.setting.delay)
+        },
+        //获取setting
+        getSetting:function(){
+            var setting=this.poster.attr("data-setting");
+            // var setting1=this.poster.data("setting"); 也可以用data
+            
+            if(setting&&setting!=null){
+                return $.parseJSON(setting)
+            }else{
+                return {}
+            }
+        },
+        //设置setting
+        setSettingValue:function(){
+            //计算div和ul的位置大小
+            this.poster.css({
+                width:this.setting.width,
+                height:this.setting.height
+            });
+            this.posterItemMain.css({
+                width:this.setting.posterWidth,
+                height:this.setting.posterHeight
+            });
+            //计算2个按钮的位置
+            var w=(this.setting.width-this.setting.posterWidth)/2;
+            this.prevBtn.css({
+                width:w,
+                height:this.setting.height,
+                zIndex:Math.ceil(this.posterItems.length/2)
+            });
+            this.nextBtn.css({
+                width:w,
+                height:this.setting.height,
+                zIndex:Math.ceil(this.posterItems.length/2)
+            });
+            //第一个li位置
+            this.firstItem.css({
+                left:w,
+                width:this.setting.posterWidth,
+                height:this.setting.posterHeight,
+                zIndex:Math.floor(this.posterItems.length/2)
+            })
+        },
+        // 设置剩余帧的位置关系
+        setPosterPos:function(){
+           var  self=this,
+            sliceItems=this.posterItems.slice(1),
+            sideLength=sliceItems.length/2,
+            level=Math.floor(this.posterLevel),
+            rightItems=sliceItems.slice(0, sideLength),
+            leftItems=sliceItems.slice(sideLength);
+
+
+
+            //设置右边帧的位置
+            var gap=((this.setting.width-this.setting.posterWidth)/2)/level,
+                rh=this.setting.posterHeight,
+                rw=this.setting.posterWidth,
+                firstOffsetleft=(this.setting.width-this.setting.posterWidth)/2+rw
+                rightIndex=level;
+            rightItems.each(function(i) {
+                level--;
+                rw=rw*self.setting.scale;
+                rh=rh*self.setting.scale;
+                
+                var j=i;
+                $(this).css({
+                    width:rw,
+                    height:rh,
+                    zIndex:level,
+                    opacity:1/(++j),
+                    left:firstOffsetleft+(++i)*gap-rw,
+                    top:self.setVerticalAlign(rh)
+                })
+            });
+            // 设置左边帧的位置
+            var lh=rightItems.last().height(),
+                lw=rightItems.last().width(),
+                loop=Math.floor(this.posterLevel);
+            leftItems.each(function(i) {
+
+                $(this).css({
+                    width:lw,
+                    height:lh,
+                    zIndex:i,
+                    opacity:1/(loop),
+                    left:i*gap,
+                    top:self.setVerticalAlign(lh)
+                })
+                lh=lh/self.setting.scale;
+                lw=lw/self.setting.scale;
+                loop--;
+            });
+            
+            
+        },
+         //对齐方式
+        setVerticalAlign:function(height){
+            var alignType=this.setting.verticalAlign
+            if (alignType=="bottom"){
+                return this.setting.posterHeight-height
+            }else if(alignType=="top"){
+                return 0
+            }else{
+                return (this.setting.posterHeight-height)/2
+            }
+        },
+        // 旋转
+        carouselRotate:function(dir){
+            var _this_=this,
+                zIndexArr=[];
+            if(dir==="left"){
+                this.posterItems.each(function() {
+                   var self=$(this),
+                    next=self.next().get(0)?self.next():_this_.firstItem,
+                    width=next.width(),
+                    height=next.height(),
+                    opacity=next.css("opacity"),
+                    zIndex=next.css("zIndex"),
+                    left=next.css("left"),
+                    top=next.css("top");
+                    zIndexArr.push(zIndex);
+                    self.animate({
+                        width:width,
+                        height:height,
+                        opacity:opacity,
+                        // zIndex:zIndex,
+                        left:left,
+                        top:top
+                    },_this_.setting.speed,function(){
+                        _this_.rotateFlag=true;
+                    })
+
+               });
+                this.posterItems.each(function(i) {
+                    $(this).css("zIndex",zIndexArr[i])
+                });
+                //右旋转
+            }else if(dir==="right"){
+               this.posterItems.each(function() {
+                   var self=$(this),
+                    prev=self.prev().get(0)?self.prev():_this_.lastItem,
+                    width=prev.width(),
+                    height=prev.height(),
+                    opacity=prev.css("opacity"),
+                    zIndex=prev.css("zIndex"),
+                    left=prev.css("left"),
+                    top=prev.css("top");
+                    zIndexArr.push(zIndex);
+                    self.animate({
+                        width:width,
+                        height:height,
+                        opacity:opacity,
+                        // zIndex:zIndex,
+                        left:left,
+                        top:top
+                    },_this_.setting.speed,function(){
+                        _this_.rotateFlag=true;
+                    })
+               });
+               this.posterItems.each(function(i) {
+                    $(this).css("zIndex",zIndexArr[i])
+                });
+
+            }
+        }
+
+    };
+    Carousel.init=function(posters){
+        var _this=this;
+        posters.each(function() {
+            new _this($(this))
+        });
+    }
+    window["Carousel"]=Carousel
+})(jQuery)
+
+
+</script>
+<script type="text/javascript">
+// Carousel
+// var carousel=new Carousel($("J_Poster").eq(0))
+$(function(){
+
+    Carousel.init($(".J_Poster"))
+})
+</script>
+</html>
